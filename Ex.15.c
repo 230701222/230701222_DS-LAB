@@ -1,152 +1,110 @@
 #include <stdio.h>
-#include <stdlib.h>
-void merge(int arr[], int l, int m, int r) 
-{ 
- int i, j, k; 
- int n1 = m - l + 1; 
- int n2 = r - m; 
- 
- int L[n1], R[n2]; 
- 
- for (i = 0; i < n1; i++) 
- L[i] = arr[l + i]; 
- for (j = 0; j < n2; j++) 
- R[j] = arr[m + 1 + j]; 
- 
- i = 0; 
- j = 0; 
- k = l; 
- while (i < n1 && j < n2) { 
- if (L[i] <= R[j]) { 
- arr[k] = L[i]; 
- i++; 
- } 
- else { 
- arr[k] = R[j]; 
- j++; 
- } 
- k++; 
- }
- while (i < n1) { 
- arr[k] = L[i]; 
- i++; 
- k++; 
- } 
- 
- while (j < n2) { 
- arr[k] = R[j]; 
- j++; 
- k++; 
- } 
-} 
- 
-void mergeSort(int arr[], int l, int r) 
-{ 
- if (l < r) { 
- // Same as (l+r)/2, but avoids 
- // overflow for large l and r 
- int m = l + (r - l) / 2; 
- 
- // Sort first and second halves 
- mergeSort(arr, l, m); 
- mergeSort(arr, m + 1, r); 
- 
- merge(arr, l, m, r); 
- } 
-} 
-void printArray(int A[], int size) 
-{ 
- int i; 
- for (i = 0; i < size; i++) 
- printf("%d ", A[i]); 
- printf("\n"); 
-}
-int main() 
-{ 
- int n;
- printf("Enter the size of the array: ");
- scanf("%d",&n);
- int arr[n];
- 
- printf("\nEnter array elements:\n");
- for (int i = 0; i < n; i++) { 
- scanf("%d", &arr[i]); 
- } 
- printf("Given array is \n"); 
- printArray(arr, n); 
- 
- mergeSort(arr, 0, n - 1); 
- 
- printf("\nSorted array is \n"); 
- printArray(arr, n); 
- return 0; 
+
+void QuickSort(int arr[], int left, int right);
+void MergeSort(int arr[], int left, int right);
+void Merge(int arr[], int left, int center, int right);
+
+int main() {
+    int i, n, choice, arr[20];
+    
+    printf("Enter the limit: ");
+    scanf("%d", &n);
+    printf("Enter the elements: ");
+    for (i = 0; i < n; i++) {
+        scanf("%d", &arr[i]);
+    }
+    
+    printf("Choose the sorting algorithm:\n");
+    printf("1. Quick Sort\n");
+    printf("2. Merge Sort\n");
+    printf("Enter your choice: ");
+    scanf("%d", &choice);
+    
+    switch (choice) {
+        case 1:
+            QuickSort(arr, 0, n - 1);
+            break;
+        case 2:
+            MergeSort(arr, 0, n - 1);
+            break;
+        default:
+            printf("Invalid choice\n");
+            return 1;
+    }
+    
+    printf("The sorted elements are: ");
+    for (i = 0; i < n; i++) {
+        printf("%d\t", arr[i]);
+    }
+    printf("\n");
+    
+    return 0;
 }
 
-
-
-
-
-#include <stdio.h>
-void swap(int* a, int* b) 
-{ 
- int temp = *a; 
- *a = *b; 
- *b = temp; 
-} 
- 
-int partition(int arr[], int low, int high) 
-{ 
- 
- int pivot = arr[low]; 
- int i = low; 
- int j = high; 
- 
- while (i < j) {
- while (arr[i] <= pivot && i <= high - 1) { 
- i++; 
- } 
- while (arr[j] > pivot && j >= low + 1) { 
- j--; 
- } 
- if (i < j) { 
- swap(&arr[i], &arr[j]); 
- } 
- } 
- swap(&arr[low], &arr[j]); 
- return j; 
+void QuickSort(int arr[], int left, int right) {
+    int i, j, temp, pivot;
+    if (left < right) {
+        pivot = left;
+        i = left + 1;
+        j = right;
+        while (i < j) {
+            while (i <= right && arr[i] < arr[pivot]) i++;
+            while (arr[j] > arr[pivot]) j--;
+            if (i < j) {
+                temp = arr[i];
+                arr[i] = arr[j];
+                arr[j] = temp;
+            }
+        }
+        temp = arr[pivot];
+        arr[pivot] = arr[j];
+        arr[j] = temp;
+        QuickSort(arr, left, j - 1);
+        QuickSort(arr, j + 1, right);
+    }
 }
-void quickSort(int arr[], int low, int high) 
-{ 
- if (low < high) { 
- int partitionIndex = partition(arr, low, high); 
- quickSort(arr, low, partitionIndex - 1); 
- quickSort(arr, partitionIndex + 1, high); 
- } 
-} 
- 
-int main() 
-{ 
- int n;
- printf("Enter the size of the array: ");
- scanf("%d",&n);
- int arr[n];
- 
- printf("\nEnter array elements:\n");
- for (int i = 0; i < n; i++) { 
- scanf("%d", &arr[i]); 
- } 
- 
- printf("Original array: "); 
- for (int i = 0; i < n; i++) { 
- printf("%d ", arr[i]); 
- } 
- 
- quickSort(arr, 0, n - 1); 
- 
- // printing the sorted array 
- printf("\nSorted array: "); 
- for (int i = 0; i < n; i++) { 
- printf("%d ", arr[i]); 
- }
- return 0; 
+
+void MergeSort(int arr[], int left, int right) {
+    int center;
+    if (left < right) {
+        center = (left + right) / 2;
+        MergeSort(arr, left, center);
+        MergeSort(arr, center + 1, right);
+        Merge(arr, left, center, right);
+    }
+}
+
+void Merge(int arr[], int left, int center, int right) {
+    int a[20], b[20], n1, n2, aptr, bptr, cptr, i, j;
+    n1 = center - left + 1;
+    n2 = right - center;
+    for (i = 0; i < n1; i++) {
+        a[i] = arr[left + i];
+    }
+    for (j = 0; j < n2; j++) {
+        b[j] = arr[center + 1 + j];
+    }
+    aptr = 0;
+    bptr = 0;
+    cptr = left;
+    while (aptr < n1 && bptr < n2) {
+        if (a[aptr] <= b[bptr]) {
+            arr[cptr] = a[aptr];
+            aptr++;
+        } else {
+            arr[cptr] = b[bptr];
+            bptr++;
+        }
+        cptr++;
+    }
+    while (aptr < n1) {
+        arr[cptr] = a[aptr];
+        aptr++;
+        cptr++;
+    }
+    while (bptr < n2) {
+        arr[cptr] = b[bptr];
+        bptr++;
+        cptr++;
+    }
 }
